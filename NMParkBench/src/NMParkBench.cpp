@@ -62,9 +62,9 @@ LPD8806 lights = LPD8806(NLEDS, CLKPIN, DPIN);
 LIDARLite_v4LED L1;
 
 //functions
-int pixelFill (int startPixel, int endPixel, int hexColor); 
+int pixelFill (int startPixel, int endPixel, int green, int red, int blue); 
 int maxRead(int band);
-
+void transitionColor(int pixel, int red, int green, int blue); 
 
 void setup() {
   Serial.begin(115200);
@@ -89,7 +89,7 @@ void setup() {
 void loop() {
   L1.takeRange(I2CADDRESS);
   L1.waitForBusy(I2CADDRESS);
-  L1.getBusyFlag(I2CADDRESS);
+  // L1.getBusyFlag(I2CADDRESS);
   distance = L1.readDistance(I2CADDRESS);
   Serial.printf("Distance = %u\n", distance);
 
@@ -124,46 +124,45 @@ if(distance<threshold) {
   Serial.printf("Band7 = %i\n", band7);
 
   if(displayLight == band1) {
-    //purple
-    pixelFill(0, NLEDS-1, purple);
+    //purple 0x0022FF GRB
+    transitionColor(0, 0x22, 0x00, 0xFF);
   }
   if(displayLight == band2) {
-    //blue
-    pixelFill(0, NLEDS-1, fullblue);
+    //blue 0x0000FF GRB
+    transitionColor(0, 0x00, 0x00, 0xFF);
   }
   if(displayLight == band3) {
-    //red
-    pixelFill(0, NLEDS-1, fullred);
+    //green 0xFF0000
+    transitionColor(0, 0x00, 0xFF, 0x00);
   }
   if(displayLight == band4) {
-    //magenta
-    pixelFill(0, NLEDS-1, fullmagenta);
+    //yellow 0xFFFF00 GRB
+    transitionColor(0, 0xFF, 0xFF, 0x00);
   }
   if(displayLight == band5) {
-    //orange 
-    pixelFill(0, NLEDS-1, orange);
+    //orange 0x33FF00 GRB
+    transitionColor(0, 0xFF, 0x33, 0x00);
   }
   if(displayLight == band6) {
-    //yellow
-    pixelFill(0, NLEDS-1, fullyellow);
+    //magenta 0x00FFFF GRB
+    transitionColor(0, 0xFF, 0x00, 0xFF);
   }
   if(displayLight == band7) {
-    //white
-    pixelFill(0, NLEDS-1, full);
+    //red 0x00FF00 GRB
+    transitionColor(0, 0xFF, 0x00, 0x00);
   }
 }
 else {
-  displayLight = pixelFill(0, NLEDS-1, nada);
+  displayLight = pixelFill(0, NLEDS-1, 0x00, 0x00, 0x00);
 }
 }
 
-int pixelFill (int startPixel, int endPixel, int hexColor) {
+int pixelFill (int startPixel, int endPixel, int green, int red, int blue) {
 
   for(int i=startPixel; i<endPixel-1; i++) {
-    lights.setPixelColor(i, hexColor);
+    lights.setPixelColor(i, green, red, blue);
   }
   lights.show();
-  //  delay(500);
   return(endPixel);
 }
 
@@ -190,3 +189,23 @@ int maxRead(int band) {
     return maxReading;
 }
 
+//Thanks to Dr. Brian Rashap for providing the following function
+// Brian's smooth transition to a new color
+void transitionColor(int pixel, int red, int green, int blue) {
+    int oldRed, oldGreen, oldBlue, oldColor;
+    int newRed, newGreen, newBlue;
+
+    oldColor = lights.getPixelColor(0);
+    oldRed = oldColor >>16;
+    oldGreen = oldColor >> 8 | 0x0000FF;
+    oldBlue = oldColor | 0x0000FF;
+
+    newRed = oldRed + (red - oldRed)/5;
+    newGreen = oldGreen + (green - oldGreen)/5;
+    newBlue = oldBlue + (blue - oldBlue)/5;
+
+    // lights.setPixelColor(pixel, red, green, blue);
+    lights.setPixelColor(0, green, red, blue);
+    pixelFill(0, NLEDS-1, green, red, blue);
+    lights.show();
+}
