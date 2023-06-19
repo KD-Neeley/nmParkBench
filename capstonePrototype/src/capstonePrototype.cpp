@@ -44,7 +44,7 @@ void loop();
 void subscriptionHandler(const char *event, const char *data);
 int pixelFill(int startPixel, int endPixel, int brightness, int hexColor);
 #line 36 "/Users/kdneeley/Documents/IoT/nmParkBench/capstonePrototype/src/capstonePrototype.ino"
-int const STROBE = A3;
+int const STROBE = A3; 
 int const OUT = A4;
 int const RESETPIN = A2;
 int soundInput;
@@ -165,7 +165,7 @@ void setup() {
   //NOTE: COMMENTING OUT THE BELOW ALLOWS US TO CONENCT TO WIFI, WITH IT THE ARGON NEVER CONNECTS.
   //Connect to Internet but not Particle Cloud
   // WiFi.on();
-  // WiFi.connect();
+  // WiFi.connect(); 
   // while(WiFi.connecting()) {
   //   Serial.printf(".");
   // }

@@ -33,7 +33,7 @@
 
 //GLOBALS
 //MSGEQ7 Sound Sensor
-int const STROBE = A3;
+int const STROBE = A3; 
 int const OUT = A4;
 int const RESETPIN = A2;
 int soundInput;
